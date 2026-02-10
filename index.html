@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Promise For You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f0f1a;
+            --text-color: #e0e0e0;
+            --accent-color: #d4af37; /* Gold */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Animated Background Stars */
+        .stars, .twinkling {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .stars {
+            background: #000 url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png') repeat top center;
+            z-index: -2;
+        }
+
+        .twinkling {
+            background: transparent url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png') repeat top center;
+            z-index: -1;
+            animation: move-twink-back 200s linear infinite;
+        }
+
+        @keyframes move-twink-back {
+            from {background-position:0 0;}
+            to {background-position:-10000px 5000px;}
+        }
+
+        /* Header Section */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            color: var(--accent-color);
+            opacity: 0;
+            animation: fadeInUp 2s ease forwards;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeInUp 2s ease 1s forwards;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        /* Quotes Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 8rem; /* Space between cards */
+            text-align: center;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 10rem;
+            color: var(--accent-color);
+            opacity: 0.1;
+        }
+
+        .quote-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            line-height: 1.6;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
+        .promise-tag {
+            display: inline-block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 5px 15px;
+            border-radius: 50px;
+        }
+
+        /* Final Promise Section */
+        .final-section {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .btn-promise {
+            margin-top: 2rem;
+            padding: 15px 40px;
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-promise::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: var(--accent-color);
+            z-index: -1;
+            transition: 0.4s;
+        }
+
+        .btn-promise:hover::before {
+            width: 100%;
+        }
+
+        .btn-promise:hover {
+            color: var(--bg-color);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .quote-text { font-size: 1.5rem; }
+            .card { padding: 2rem; margin-bottom: 5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+
+    <header>
+        <h1>Happy Promise Day</h1>
+        <div class="subtitle">For the one who holds my universe</div>
+        <div class="scroll-indicator" onclick="scrollToContent()">↓</div>
+    </header>
+
+    <div class="container" id="content">
+        
+        <div class="card">
+            <p class="quote-text">"In a room full of art, I would still stare at you. Not just because of how you look, but because of the masterpiece you are within."</p>
+            <span class="promise-tag">Admiration</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"I promise to walk beside you when the road is smooth, and I promise to carry you when the path gets rough."</p>
+            <span class="promise-tag">Support</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"Your eyes are the only map I need to find my way home. In them, I see my future, my peace, and my forever."</p>
+            <span class="promise-tag">Home</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"I promise to listen. Not just to the words you speak, but to the silence in between them where your heart hides its fears."</p>
+            <span class="promise-tag">Understanding</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"You are the poetry the world forgot to write, and I am the lucky one who gets to read you every single day."</p>
+            <span class="promise-tag">Love</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"I promise to choose you. Over and over, without pause, without doubt, in a heartbeat. I’ll keep choosing you."</p>
+            <span class="promise-tag">Commitment</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"To the world, you may be just one person. But to me, you are the entire world."</p>
+            <span class="promise-tag">Devotion</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"I promise to grow with you. To learn from yesterday, to live for today, and to build a beautiful tomorrow, together."</p>
+            <span class="promise-tag">Future</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"I promise to be your calm in the chaos, your spark in the dark, and the hand that never lets go."</p>
+            <span class="promise-tag">Safety</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"Loving you is the easiest thing I have ever done. It breathes life into parts of me I didn't know were sleeping."</p>
+            <span class="promise-tag">Passion</span>
+        </div>
+
+        <div class="card">
+            <p class="quote-text">"Every glance at you reminds me of why I believe in miracles. You are the proof that magic exists."</p>
+            <span class="promise-tag">Wonder</span>
+        </div>
+
+        <div class="card final-card">
+            <p class="quote-text">"Forever isn't long enough, but I promise to make every moment count until then."</p>
+            <span class="promise-tag">Eternity</span>
+        </div>
+
+    </div>
+
+    <div class="final-section">
+        <h1>My Forever Promise</h1>
+        <p class="subtitle" style="opacity: 1;">I am yours, today and always.</p>
+        <button class="btn-promise" onclick="sealPromise()">Seal The Promise</button>
+    </div>
+
+    <script>
+        // Smooth Scroll
+        function scrollToContent() {
+            document.getElementById('content').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Intersection Observer for Scroll Animations
+        const observerOptions = {
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Button Effect
+        function sealPromise() {
+            const btn = document.querySelector('.btn-promise');
+            btn.innerHTML = "Promise Sealed ❤️";
+            btn.style.backgroundColor = "#d4af37";
+            btn.style.color = "#0f0f1a";
+            
+            // Confetti effect
+            for(let i=0; i<100; i++) {
+                createParticle(btn.getBoundingClientRect().left + btn.offsetWidth/2, 
+                               btn.getBoundingClientRect().top + btn.offsetHeight/2);
+            }
+        }
+
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            document.body.appendChild(particle);
+
+            const size = Math.random() * 10 + 5;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            const destinationX = x + (Math.random() - 0.5) * 500;
+            const destinationY = y + (Math.random() - 0.5) * 500;
+
+            const animation = particle.animate([
+                {
+                    transform: `translate(${x}px, ${y}px)`,
+                    opacity: 1
+                },
+                {
+                    transform: `translate(${destinationX}px, ${destinationY}px)`,
+                    opacity: 0
+                }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0, .9, .57, 1)',
+                fill: 'forwards'
+            });
+
+            animation.onfinish = () => particle.remove();
+        }
+    </script>
+</body>
+</html>
+
